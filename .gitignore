@@ -10,6 +10,9 @@
 
 # CS - IGNORE MANIFEST FOLDER
 src/META-INF
+
+# CS - IGNORE TARGET FOLDER
+target
 #--------------------------------
 
 # User-specific stuff
