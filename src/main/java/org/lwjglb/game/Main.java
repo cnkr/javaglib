@@ -1,6 +1,29 @@
 package org.lwjglb.game;
 
-// import glfw and opengl libraries
+import org.lwjglb.engine.IGameLogic;
+
+public class Main {
+
+    public static void main(String[] args) {
+        try {
+            boolean vSync = true;
+            IGameLogic gameLogic = new DummyGame();
+            GameEngine gameEngine = new GameEngine(
+                    "Game",
+                    600,
+                    480,
+                    vSync,
+                    gameLogic
+            );
+            gameEngine.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+}
+
+/*// import glfw and opengl libraries
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -9,7 +32,6 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import static org.lwjgl.glfw.Callbacks.*;
-
 
 public class Main {
 
@@ -84,3 +106,4 @@ public class Main {
         new Main().run();
     }
 }
+*/
