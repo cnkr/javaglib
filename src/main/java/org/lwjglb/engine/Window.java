@@ -1,8 +1,15 @@
 package org.lwjglb.engine;
 
-public abstract class Window {
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.*;
 
-    private final String TITLE;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.system.MemoryUtil.*;
+
+public class Window {
+
+    private final String title;
     private int width;
     private int height;
     private long windowHandle;
@@ -10,23 +17,111 @@ public abstract class Window {
     private boolean vSync;
 
     public Window(String title, int width, int height, boolean vSync) {
-        this.TITLE = title;
+        this.title = title;
         this.width = width;
         this.height = height;
         this.vSync = vSync;
         this.resized = false;
     }
 
-    abstract public void init();
-    abstract public void setClearColor(float r, float g, float b, float alpha);
-    abstract public boolean isKeyPressed(int keyCode);
-    abstract public boolean windowShouldClose();
-    abstract public String getTitle();
-    abstract public int getWidth();
-    abstract public int getHeight();
-    abstract public boolean isResized();
-    abstract public void setResized(boolean resized);
-    abstract public boolean isvSync();
-    abstract public void setvSync(boolean vSync);
-    abstract public void update();
+    public void init() {
+        GLFWErrorCallback.createPrint(System.err).set();
+
+        if (!glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
+
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+
+        windowHandle = glfwCreateWindow(width, height, title, NULL, NULL);
+
+        if (windowHandle == NULL) {
+            throw new IllegalStateException("Unable to create window.");
+        }
+
+        glfwSetFramebufferSizeCallback(
+                windowHandle,
+                (window, width, height) -> {
+                    this.width = width;
+                    this.height = height;
+                    this.setResized(true);
+                }
+        );
+
+        glfwSetKeyCallback(
+                windowHandle,
+                (window, key, scancode, action, mods) -> {
+                    if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                        glfwSetWindowShouldClose(window, true);
+                    }
+                }
+        );
+
+        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+        glfwSetWindowPos(windowHandle, (vidMode.width() - width) / 2, (vidMode.height() - height) / 2); //todo correct
+
+        glfwMakeContextCurrent(windowHandle);
+
+        if (isvSync()) {
+            glfwSwapInterval(1);
+        }
+
+        glfwShowWindow(windowHandle);
+
+        GL.createCapabilities();
+
+        glClearColor(0f, 0f, 0f, 0f);
+    }
+
+    public void setClearColor(float r, float g, float b, float alpha) {
+        glClearColor(r, g, b, alpha);
+    }
+
+    public boolean isKeyPressed(int keyCode) {
+        return glfwGetKey(windowHandle, keyCode) == GLFW_PRESS;
+    }
+
+    public boolean windowShouldClose() {
+        return glfwWindowShouldClose(windowHandle);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public boolean isResized() {
+        return resized;
+    }
+
+    public void setResized(boolean resized) {
+        this.resized = resized;
+    }
+
+    public boolean isvSync() {
+        return vSync;
+    }
+
+    public void setvSync(boolean vSync) {
+        this.vSync = vSync;
+    }
+
+    public void update() {
+        glfwSwapBuffers(windowHandle);
+        glfwPollEvents();
+    }
 }
