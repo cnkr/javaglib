@@ -1,18 +1,22 @@
 package org.lwjglb.engine;
 
+import org.lwjglb.game.Renderer;
+
 public class GameEngine implements Runnable {
 
     public static final int TARGET_FPS = 75;
+
     public static final int TARGET_UPS = 30;
 
     private final Window window;
+
     private final Thread gameLoopThread;
+
     private final Timer timer;
+
     private final IGameLogic gameLogic;
 
-    public GameEngine(
-            String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic
-    ) throws Exception {
+    public GameEngine(String windowTitle, int width, int height, boolean vSync, IGameLogic gameLogic) throws Exception {
         gameLoopThread = new Thread(this, "GAME_LOOP_THREAD");
         window = new Window(windowTitle, width, height, vSync);
         this.gameLogic = gameLogic;
@@ -21,7 +25,7 @@ public class GameEngine implements Runnable {
 
     public void start() {
         String osName = System.getProperty("os.name");
-        if (osName.contains("Mac")) {
+        if ( osName.contains("Mac") ) {
             gameLoopThread.run();
         } else {
             gameLoopThread.start();
@@ -30,12 +34,13 @@ public class GameEngine implements Runnable {
 
     @Override
     public void run() {
-
         try {
             init();
             gameLoop();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception excp) {
+            excp.printStackTrace();
+        } finally {
+            cleanup();
         }
     }
 
@@ -51,7 +56,6 @@ public class GameEngine implements Runnable {
         float interval = 1f / TARGET_UPS;
 
         boolean running = true;
-
         while (running && !window.windowShouldClose()) {
             elapsedTime = timer.getElapsedTime();
             accumulator += elapsedTime;
@@ -65,10 +69,14 @@ public class GameEngine implements Runnable {
 
             render();
 
-            if (!window.isvSync()) {
+            if ( !window.isvSync() ) {
                 sync();
             }
         }
+    }
+
+    protected void cleanup() {
+        gameLogic.cleanup();
     }
 
     private void sync() {
@@ -77,8 +85,7 @@ public class GameEngine implements Runnable {
         while (timer.getTime() < endTime) {
             try {
                 Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ie) {
             }
         }
     }
@@ -95,6 +102,4 @@ public class GameEngine implements Runnable {
         gameLogic.render(window);
         window.update();
     }
-
-
 }

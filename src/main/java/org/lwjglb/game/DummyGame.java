@@ -1,5 +1,7 @@
 package org.lwjglb.game;
 
+
+
 import org.lwjglb.engine.IGameLogic;
 import org.lwjglb.engine.Window;
 
@@ -9,12 +11,16 @@ import static org.lwjgl.opengl.GL11.*;
 public class DummyGame implements IGameLogic {
 
     private int direction = 0;
+
     private float color = 0.0f;
     private final Renderer renderer;
+
+
 
     public DummyGame() {
         renderer = new Renderer();
     }
+
 
     @Override
     public void init() throws Exception {
@@ -44,13 +50,16 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        if (window.isResized()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResized(false);
-        }
+
 
         window.setClearColor(color, color, color, 0);
-        renderer.clear();
+        renderer.render(window);
 
     }
+
+    @Override
+    public void cleanup() {
+        renderer.cleanup();
+    }
 }
+

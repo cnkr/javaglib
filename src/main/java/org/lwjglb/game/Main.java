@@ -1,7 +1,7 @@
 package org.lwjglb.game;
 
-import org.lwjglb.engine.IGameLogic;
 import org.lwjglb.engine.GameEngine;
+import org.lwjglb.engine.IGameLogic;
 
 public class Main {
 
@@ -9,13 +9,7 @@ public class Main {
         try {
             boolean vSync = true;
             IGameLogic gameLogic = new DummyGame();
-            GameEngine gameEng = new GameEngine(
-                    "Game",
-                    600,
-                    480,
-                    vSync,
-                    gameLogic
-            );
+            GameEngine gameEng = new GameEngine("GAME", 600, 480, vSync, gameLogic);
             gameEng.start();
         } catch (Exception excp) {
             excp.printStackTrace();
@@ -23,4 +17,3 @@ public class Main {
         }
     }
 }
-
